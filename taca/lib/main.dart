@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:taca/home_content.dart';
 import 'package:taca/home_page.dart';
+import 'package:taca/landing_page.dart';
 import 'login_page.dart';
 
 void main() {
@@ -15,12 +17,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(), 
+      home: LandingPage(), 
       initialRoute: '/',
       routes: {
-        // '/': (context) => SplashScreen(),
+        '/landing': (context) => LandingPage(),
         '/login': (context) => LoginPage(),
-        '/home': (context) => HomePage(),
+        '/home': (context) => HomeContent(),
+        // '/home': (context) => HomePage(),
       },// Set LoginPage as the initial route
     );
     

@@ -26,9 +26,11 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Booking Status'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
         actions: [
           IconButton(
             icon: Icon(Icons.edit, color: Colors.white),
@@ -38,6 +40,7 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
           ),
         ],
       ),
+      backgroundColor: Colors.grey[900],
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
@@ -64,7 +67,7 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
                 Container(
                   padding: EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.grey[900],
                     borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                   ),
                   child: Column(
@@ -74,7 +77,7 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
                         "Hello, Abin!",
                         style: TextStyle(
                           fontSize: 22,
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -160,7 +163,7 @@ class ReservationCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Colors.black,
         borderRadius: BorderRadius.circular(16.0),
       ),
       child: Column(
@@ -248,7 +251,7 @@ class CateringCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Colors.black,
         borderRadius: BorderRadius.circular(16.0),
       ),
       child: Column(

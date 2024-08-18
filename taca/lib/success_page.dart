@@ -44,7 +44,8 @@ class SuccessPage extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.popUntil(context, ModalRoute.withName('/home'));
+                 Navigator.pushReplacementNamed(context, '/home');
+
 
                 },
                 child: Text(

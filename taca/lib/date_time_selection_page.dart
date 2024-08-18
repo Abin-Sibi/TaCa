@@ -1,4 +1,3 @@
-// lib/date_time_selection_page.dart
 import 'package:flutter/material.dart';
 import 'package:taca/utils/route_utils.dart';
 import 'table_selection_page.dart';
@@ -64,112 +63,147 @@ class _DateTimeSelectionPageState extends State<DateTimeSelectionPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final Gradient gradient = LinearGradient(
+      colors: [Colors.deepOrange, Colors.orangeAccent],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
     return Scaffold(
+      backgroundColor: Colors.grey[900],
       appBar: AppBar(
-        title: Text('Reserve a Table at ${widget.restaurantName}'),
-        backgroundColor: Colors.deepOrange,
+        title: Text('Reserve a Table at ${widget.restaurantName}',style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  'Select Date and Time',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepOrange,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Select a Date',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              GestureDetector(
-                onTap: _selectDate,
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.deepOrange.shade50,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.deepOrange),
-                  ),
+      body: Container(
+        color: Colors.grey[900], // Light black background
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
                   child: Text(
-                    _selectedDate == null
-                        ? 'Select Date'
-                        : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Select a Time',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              GestureDetector(
-                onTap: _selectTime,
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.deepOrange.shade50,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.deepOrange),
-                  ),
-                  child: Text(
-                    _selectedTime == null
-                        ? 'Select Time'
-                        : 'Time: ${_selectedTime!.format(context)}',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              SizedBox(height: 40),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_selectedDate != null && _selectedTime != null) {
-                      Navigator.of(context).push(createFadeRoute(TableSelectionPage(
-                            restaurantName: widget.restaurantName,
-                            selectedDate: _selectedDate!,
-                            selectedTime: _selectedTime!,
-                          )));
-                    } else {
-                      // Show error
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please select both date and time'),
-                        ),
-                      );
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12.0, horizontal: 24.0),
-                    child: Text(
-                      'Next',
-                      style: TextStyle(fontSize: 18),
+                    'Select Date and Time',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepOrange,
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    shape: RoundedRectangleBorder(
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Select a Date',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: _selectDate,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.deepOrange),
+                    ),
+                    child: Text(
+                      _selectedDate == null
+                          ? 'Select Date'
+                          : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Select a Time',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: _selectTime,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.deepOrange),
+                    ),
+                    child: Text(
+                      _selectedTime == null
+                          ? 'Select Time'
+                          : 'Time: ${_selectedTime!.format(context)}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: gradient,
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_selectedDate != null && _selectedTime != null) {
+                          Navigator.of(context).push(createFadeRoute(
+                            TableSelectionPage(
+                              restaurantName: widget.restaurantName,
+                              selectedDate: _selectedDate!,
+                              selectedTime: _selectedTime!,
+                            ),
+                          ));
+                        } else {
+                          // Show error
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Please select both date and time'),
+                            ),
+                          );
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 24.0),
+                        child: Text(
+                          'Next',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        elevation: 5,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

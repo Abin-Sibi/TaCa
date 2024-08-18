@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:taca/sign_up_page.dart';
-import 'package:taca/utils/route_utils.dart';
-import 'home_page.dart';
+import 'home_page.dart'; // Replace with your appropriate HomePage import
 
-class LoginPage extends StatelessWidget {
+class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +12,7 @@ class LoginPage extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/landingbanner.jpg'), // Replace with your image asset path
+                image: AssetImage('assets/images/land3.jpg'), // Replace with your image asset path
                 fit: BoxFit.cover,
               ),
             ),
@@ -42,7 +40,7 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Welcome to',
+                        'Join Us at',
                         style: TextStyle(
                           fontSize: 24,
                           color: Colors.white,
@@ -60,7 +58,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'Enjoy the best dining experience',
+                        'Experience the best dining',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
@@ -70,7 +68,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 150), // Adjust the height as per your design
-                // Login Form in Black Background
+                // Signup Form in Black Background
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   margin: EdgeInsets.symmetric(horizontal: 24),
@@ -80,6 +78,22 @@ class LoginPage extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      // Name Field
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Full Name',
+                          hintStyle: TextStyle(color: Colors.white54),
+                          filled: true,
+                          fillColor: Colors.black.withOpacity(0.1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        style: TextStyle(color: Colors.white),
+                        keyboardType: TextInputType.name,
+                      ),
+                      SizedBox(height: 16),
                       // Email Field
                       TextField(
                         decoration: InputDecoration(
@@ -112,49 +126,52 @@ class LoginPage extends StatelessWidget {
                         obscureText: true,
                       ),
                       SizedBox(height: 24),
-                      // Login Button with Gradient
+                      // Signup Button with Gradient
                       SizedBox(
                         width: double.infinity,
-                        child: InkWell(
-                          onTap: () {
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Handle signup logic
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => HomePage()),
                             );
                           },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            decoration: BoxDecoration(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.all(0),
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: Colors.transparent, // Remove default background color
+                            shadowColor: Colors.transparent, // Remove shadow
+                          ),
+                          child: Ink(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [
-                                  Colors.orangeAccent.shade200,
-                                  Colors.orangeAccent.shade700,
-                                ],
+                                colors: [Colors.orangeAccent, Colors.deepOrange], // Gradient colors
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Center(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              alignment: Alignment.center,
                               child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                'Sign Up',
+                                style: TextStyle(fontSize: 18),
                               ),
                             ),
                           ),
                         ),
                       ),
                       SizedBox(height: 16),
-                      // Signup Button
+                      // Navigate to Login Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).push(createFadeRoute(SignupPage()));
+                            Navigator.pop(context); // Navigate back to the Login Page
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 16),
@@ -164,7 +181,7 @@ class LoginPage extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'Sign Up',
+                            'Already have an account? Log In',
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.black,

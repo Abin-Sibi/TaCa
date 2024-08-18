@@ -31,11 +31,17 @@ dependencies:
   flutter:
     sdk: flutter
   carousel_slider: ^4.0.0
+  http: ^0.13.4
+  image_picker: ^0.8.4+7
+  geolocator: ^12.0.0
+  geolocator_android: ^4.5.5
+  geocoding: ^2.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
+  fluttertoast: ^8.2.8
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +87,9 @@ flutter:
     - assets/images/caterer3.jpeg
     - assets/images/chicken_biriyani.jpeg
     - assets/images/veg_friedrice.png
+    - assets/images/land3.jpg
+    - assets/images/landingbanner.jpg
+    - assets/images/landing2.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -3,7 +3,7 @@ import 'package:taca/notification_page.dart';
 import 'package:taca/profile_page.dart';
 import 'package:taca/reservation_history_page.dart';
 import 'home_content.dart';
-import 'bottom_nav.dart'; // Import the main content with buttons
+import 'bottom_nav.dart'; // Import the custom BottomNavigationBar
 
 class HomePage extends StatefulWidget {
   @override
@@ -53,19 +53,21 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: List.generate(4, (index) => _buildOffstageNavigator(index)),
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        backgroundColor: Colors.black.withOpacity(0.7),
-        selectedItemColor: Colors.deepOrange,
-        unselectedItemColor: Colors.grey,
-      ),
-    );
-  }
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.black, // Set the scaffold background color to black
+    body: Stack(
+      children: List.generate(4, (index) => _buildOffstageNavigator(index)),
+    ),
+    bottomNavigationBar: CustomBottomNavigationBar(
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      backgroundColor: Colors.black, // Set the background color to black
+      selectedItemColor: Colors.deepOrange,
+      unselectedItemColor: Colors.grey,
+    ),
+  );
+}
+
 }

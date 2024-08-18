@@ -6,14 +6,15 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.black,
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
       ),
+      backgroundColor: Colors.grey[900],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -31,17 +32,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       'Abin Sibi',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(height: 4),
                     Text(
                       'abin.sibi@example.com',
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(color: Colors.grey[400]),
                     ),
                     SizedBox(height: 4),
                     Text(
                       '123-456-7890',
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(color: Colors.grey[400]),
                     ),
                   ],
                 ),
@@ -81,22 +86,34 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                   ),
                   SizedBox(height: 20),
-                  // Logout Button
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle logout functionality
-                      Navigator.pushNamed(context, '/login');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  // Logout Button with Gradient Background
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.deepOrange, Colors.orangeAccent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      'Logout',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Handle logout functionality
+                        Navigator.pushNamed(context, '/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent, // Set to transparent to show gradient
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        shadowColor: Colors.transparent, // Remove shadow
+                      ),
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ),
                   ),
                 ],
@@ -122,10 +139,24 @@ class ProfileOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.deepOrange),
-      title: Text(title, style: TextStyle(fontSize: 18)),
-      onTap: onTap,
+    return Card(
+      color: Colors.black,
+      margin: const EdgeInsets.only(bottom: 16.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.deepOrange[100],
+          child: Icon(icon, color: Colors.deepOrange),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      ),
     );
   }
 }

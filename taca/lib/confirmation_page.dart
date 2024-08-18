@@ -1,4 +1,3 @@
-// lib/confirmation_page.dart
 import 'package:flutter/material.dart';
 import 'package:taca/utils/route_utils.dart';
 import 'success_page.dart';
@@ -21,9 +20,12 @@ class ConfirmationPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Confirm Reservation'),
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.black,
+        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.grey[900],
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,55 +35,65 @@ class ConfirmationPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.deepOrange,
+                color: Colors.white,
               ),
             ),
             SizedBox(height: 20),
             Card(
               elevation: 5,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(15),
               ),
+              color: Colors.grey[800],
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Restaurant: $restaurantName',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 15),
                     Text(
                       'Date: ${selectedDate.toLocal().toString().split(' ')[0]}',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 15),
                     Text(
                       'Time: ${selectedTime.format(context)}',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                    SizedBox(height: 15),
+                    Text(
+                      'Table(s): ${tableNumbers.join(', ')}',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                    SizedBox(height: 20),
+                    Divider(color: Colors.grey[600]),
+                    SizedBox(height: 10),
+                    Text(
+                      'Additional Information:',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orangeAccent,
+                      ),
                     ),
                     SizedBox(height: 10),
                     Text(
-                      'Table(s): ${tableNumbers.join(', ')}',
-                      style: TextStyle(fontSize: 18),
+                      '• Please arrive 10 minutes before the reservation time.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[400]),
                     ),
-                    SizedBox(height: 20),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
-                      itemCount: tableNumbers.length,
-                      itemBuilder: (context, index) {
-                        return Image.asset(
-                          'assets/images/table.png', // Ensure you have a table image in assets
-                          fit: BoxFit.cover,
-                        );
-                      },
+                    SizedBox(height: 10),
+                    Text(
+                      '• Your table will be held for 15 minutes past the reservation time.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[400]),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      '• Free Wi-Fi is available for all guests.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[400]),
                     ),
                   ],
                 ),
@@ -89,21 +101,29 @@ class ConfirmationPage extends StatelessWidget {
             ),
             Spacer(),
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(createFadeRoute(SuccessPage()));
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepOrange, Colors.orangeAccent],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(createFadeRoute(SuccessPage()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent, // Make the button background transparent
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 24.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                   child: Text(
                     'Confirm Reservation',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ),

@@ -1,16 +1,66 @@
-// lib/models/restaurant.dart
 class Restaurant {
+  final String id;
   final String name;
+  final String place;
+  final String mobno;
+  final String emailid;
+  final String type;
+  final String category;
+  final String geography;
+  final List<TableModel> tables;
   final String imageUrl;
-  final double rating;
-  final String cuisineType;
-  final String location;
+  final int rating;
 
   Restaurant({
+    required this.id,
     required this.name,
-    required this.imageUrl,
+    required this.place,
+    required this.mobno,
+    required this.emailid,
+    required this.type,
+    required this.category,
+    required this.geography,
+    required this.tables,
+    required this.imageUrl, 
     required this.rating,
-    required this.cuisineType,
-    required this.location,
   });
+
+  factory Restaurant.fromJson(Map<String, dynamic> json) {
+    return Restaurant(
+      id: json['_id'] is Map ? json['_id']['\$oid'] : json['_id'],
+      name: json['name'],
+      place: json['place'],
+      mobno: json['mobno'],
+      emailid: json['emailid'],
+      type: json['type'],
+      category: json['category'],
+      geography: json['geography'],
+      tables: (json['tables'] as List).map((i) => TableModel.fromJson(i)).toList(),
+      imageUrl: json['imageUrl'] ?? 'assets/images/splash_logo.png',
+      rating: json['rating'] ?? 5,
+    );
+  }
+}
+
+class TableModel {
+  final int tableNumber;
+  final int chairs;
+  final int x;
+  final int y;
+
+  TableModel({
+    required this.tableNumber,
+    required this.chairs,
+    required this.x,
+    required this.y,
+  });
+
+  factory TableModel.fromJson(Map<String, dynamic> json) {
+    return TableModel(
+      tableNumber: json['tableNumber'],
+      chairs: json['chairs'],
+      x: json['position']?['x'] ?? 0, // Safely access and provide default values
+      y: json['position']?['y'] ?? 0,
+    );
+  }
 }

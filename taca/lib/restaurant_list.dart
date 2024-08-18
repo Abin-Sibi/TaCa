@@ -1,32 +1,48 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:taca/restaurant_details_page.dart';
-import 'package:taca/utils/route_utils.dart';
-import 'models/restaurants.dart'; // Ensure you have this model
-import 'widgets/restaurant_list_widget.dart'; // Import your existing RestaurantList widget
+import 'package:http/http.dart' as http;
+import 'models/restaurants.dart';
+import 'restaurant_details_page.dart';
+import 'widgets/restaurant_list_widget.dart';
+import 'utils/route_utils.dart';
 
-class RestaurantList extends StatelessWidget {
+class RestaurantList extends StatefulWidget {
   final String title;
 
   RestaurantList({required this.title});
 
-  final List<Restaurant> _restaurants = [
-    Restaurant(
-      name: 'Restaurant 1',
-      imageUrl: 'assets/images/beach2.jpeg',
-      rating: 4,
-      cuisineType: 'Italian',
-      location: 'New York',
-    ),
-    Restaurant(
-      name: 'Restaurant 2',
-      imageUrl: 'assets/images/lake2.jpeg',
-      rating: 5,
-      cuisineType: 'Chinese',
-      location: 'Los Angeles',
-    ),
-    // Add more restaurants as needed...
-  ];
+  @override
+  _RestaurantListState createState() => _RestaurantListState();
+}
+
+class _RestaurantListState extends State<RestaurantList> {
+  List<Restaurant> _restaurants = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRestaurants();
+  }
+
+  Future<void> fetchRestaurants() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://192.168.1.5:5000/api/restaurants'));
+          print('Response body: ${response.body}');
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _restaurants = data.map((json) => Restaurant.fromJson(json)).toList();
+        });
+      } else {
+        throw Exception('Failed to load restaurants');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
 
   void _showFilterDialog(BuildContext context) {
     showDialog(
@@ -39,14 +55,14 @@ class RestaurantList extends StatelessWidget {
             children: <Widget>[
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
-                  labelText: 'Cuisine Type',
+                  labelText: 'Type',
                 ),
                 items: <String>[
                   'Italian',
                   'Chinese',
                   'Indian',
                   'Mexican',
-                  'Thai',
+                  'Thai'
                 ].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -77,13 +93,8 @@ class RestaurantList extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Geography',
                 ),
-                items: <String>[
-                  'North',
-                  'South',
-                  'East',
-                  'West',
-                  'Central',
-                ].map((String value) {
+                items: <String>['North', 'South', 'East', 'West', 'Central']
+                    .map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -103,7 +114,6 @@ class RestaurantList extends StatelessWidget {
             TextButton(
               child: Text('Apply'),
               onPressed: () {
-                // Apply filter logic
                 Navigator.of(context).pop();
               },
             ),
@@ -117,81 +127,125 @@ class RestaurantList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.deepOrange,
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.black,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 200.0,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                aspectRatio: 16 / 9,
-                autoPlayCurve: Curves.fastOutSlowIn,
-                enableInfiniteScroll: true,
-                autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                viewportFraction: 0.8,
-              ),
-              items: [
-                'assets/images/hill2.jpeg',
-                'assets/images/hill3.jpeg',
-                'assets/images/lake2.jpeg'
-              ].map((i) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.amber,
-                      ),
-                      child: Image.asset(
-                        i,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Search for restaurants',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+      body: Container(
+        color: Colors.grey[900],
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              const SizedBox(height: 20),
+              CarouselSlider(
+                options: CarouselOptions(
+                  height: 200.0,
+                  autoPlay: true,
+                  enlargeCenterPage: true,
+                  aspectRatio: 16 / 9,
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enableInfiniteScroll: true,
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                  viewportFraction: 0.8,
+                ),
+                items: [
+                  'assets/images/hill2.jpeg',
+                  'assets/images/hill3.jpeg',
+                  'assets/images/lake2.jpeg'
+                ].map((i) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.deepOrange, Colors.orangeAccent],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                         ),
-                        prefixIcon: const Icon(Icons.search),
+                        child: Image.asset(
+                          i,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Search for restaurants',
+                          labelStyle: TextStyle(color: Colors.white70),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors
+                                  .deepOrange, // Set the border color here
+                              width: 2,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors
+                                  .deepOrange, // Set the border color when the TextField is enabled
+                              width: 2,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors
+                                  .orangeAccent, // Set the border color when the TextField is focused
+                              width: 2,
+                            ),
+                          ),
+                          prefixIcon:
+                              const Icon(Icons.search, color: Colors.white70),
+                          filled: true,
+                          fillColor: Colors.grey[800],
+                        ),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  ),
-                  IconButton(
-            icon: Icon(Icons.filter_list),
-            onPressed: () => _showFilterDialog(context),
-          ),
-                ],
+                    const SizedBox(width: 10),
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [Colors.deepOrange, Colors.orangeAccent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: IconButton(
+                        icon: Icon(Icons.filter_list),
+                        onPressed: () => _showFilterDialog(context),
+                        color: Colors.white, // Ensure the icon is visible
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            RestaurantListWidget(
-              restaurants: _restaurants,
-              onTap: (Restaurant restaurant) {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => RestaurantDetailPage(restaurant: restaurant),
-                //   ),
-                // );
-                Navigator.of(context).push(createFadeRoute(RestaurantDetailPage(restaurant: restaurant)));
-              },
-            ),
-          ],
+              RestaurantListWidget(
+                restaurants: _restaurants,
+                onTap: (Restaurant restaurant) {
+                  Navigator.of(context).push(
+                    createFadeRoute(
+                        RestaurantDetailPage(restaurant: restaurant)),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -62,13 +62,36 @@ class HomeContent extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.restaurant_menu, color: Colors.white, size: 40), // Icon
-                        SizedBox(height: 8),
-                        Text(
-                          'Dining Views',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: Colors.white), // Adjust font size
+                      children: [
+                        // Icon with Gradient
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [Colors.deepOrange, Colors.orangeAccent],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds),
+                          child: const Icon(
+                            Icons.restaurant_menu,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Text with Gradient
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [Colors.deepOrange, Colors.orangeAccent],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds),
+                          child: const Text(
+                            'Dining Views',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white, // The gradient will override this color
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -93,13 +116,36 @@ class HomeContent extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.local_dining, color: Colors.white, size: 40), // Icon
-                        SizedBox(height: 8),
-                        Text(
-                          'Catering Service',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: Colors.white), // Adjust font size
+                      children: [
+                        // Icon with Gradient
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [Colors.deepOrange, Colors.orangeAccent],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds),
+                          child: const Icon(
+                            Icons.local_dining,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Text with Gradient
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [Colors.deepOrange, Colors.orangeAccent],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds),
+                          child: const Text(
+                            'Catering Service',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white, // The gradient will override this color
+                            ),
+                          ),
                         ),
                       ],
                     ),
