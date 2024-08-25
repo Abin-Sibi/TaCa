@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:taca/controllers/auth_controller.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -8,6 +10,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find<AuthController>();
+     final userDetails = authController.userDetails.value;
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
@@ -31,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Abin Sibi',
+                      '${userDetails['name'] ?? 'Unknown'}',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -40,12 +44,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'abin.sibi@example.com',
+                      '${userDetails['email'] ?? 'Unknown'}',
                       style: TextStyle(color: Colors.grey[400]),
                     ),
                     SizedBox(height: 4),
                     Text(
-                      '123-456-7890',
+                      '${userDetails['phone'] ?? 'Unknown'}',
                       style: TextStyle(color: Colors.grey[400]),
                     ),
                   ],

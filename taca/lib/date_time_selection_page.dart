@@ -4,8 +4,9 @@ import 'table_selection_page.dart';
 
 class DateTimeSelectionPage extends StatefulWidget {
   final String restaurantName;
+  final String restaurantId;
 
-  DateTimeSelectionPage({required this.restaurantName});
+  DateTimeSelectionPage({required this.restaurantName,required this.restaurantId});
 
   @override
   _DateTimeSelectionPageState createState() => _DateTimeSelectionPageState();
@@ -172,6 +173,7 @@ class _DateTimeSelectionPageState extends State<DateTimeSelectionPage> {
                               restaurantName: widget.restaurantName,
                               selectedDate: _selectedDate!,
                               selectedTime: _selectedTime!,
+                              restaurantId:widget.restaurantId,
                             ),
                           ));
                         } else {

@@ -1,4 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:taca/config/api_config.dart';
+import 'package:taca/controllers/auth_controller.dart';
 import 'package:taca/utils/route_utils.dart';
 import 'success_page.dart';
 
@@ -6,17 +11,61 @@ class ConfirmationPage extends StatelessWidget {
   final String restaurantName;
   final DateTime selectedDate;
   final TimeOfDay selectedTime;
-  final List<int> tableNumbers;
+  final List<Map<String, dynamic>> tableData; // Updated
+  final String restaurantId;
 
   ConfirmationPage({
     required this.restaurantName,
     required this.selectedDate,
     required this.selectedTime,
-    required this.tableNumbers,
+    required this.tableData,
+    required this.restaurantId,
   });
+
+  Future<void> _createBooking(BuildContext context) async {
+  try {
+    final String bookingDate = selectedDate.toIso8601String().split('T')[0];
+    final String bookingTimeSlot =
+        '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}-'
+        '${(selectedTime.hour + 1).toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
+    
+     final AuthController authController = Get.find<AuthController>();
+     final userDetails = authController.userDetails.value; // Replace with actual restaurant ID
+
+    // Extract table IDs from the selected table data
+    final List<String> tableIds = tableData.map((table) => table['_id'] as String).toList();
+
+    final response = await http.post(
+      Uri.parse('${APIConfig.baseURL}/create'), // Adjust the URL as needed
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': "${userDetails['_id'] ?? 'Unknown'}",
+        'restaurantId': restaurantId,
+        'tableIds': tableIds, // Sending multiple table IDs
+        'bookingDate': bookingDate,
+        'bookingTimeSlot': bookingTimeSlot,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      Navigator.of(context).push(createFadeRoute(SuccessPage()));
+    } else {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create booking: ${responseData['message']}')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An error occurred while creating the booking.')),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
+    print('Ldfa : $restaurantId');
     return Scaffold(
       appBar: AppBar(
         title: Text('Confirm Reservation'),
@@ -66,7 +115,7 @@ class ConfirmationPage extends StatelessWidget {
                     ),
                     SizedBox(height: 15),
                     Text(
-                      'Table(s): ${tableNumbers.join(', ')}',
+                      'Table(s): ${tableData.map((table) => 'Table ${table['tableNumber']} (${table['chairs']} chairs)').join(', ')}',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                     SizedBox(height: 20),
@@ -109,12 +158,10 @@ class ConfirmationPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(createFadeRoute(SuccessPage()));
-                  },
+                  onPressed: () => _createBooking(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent, // Make the button background transparent
+                    shadowColor: Colors.transparent,
                     padding: const EdgeInsets.symmetric(
                         vertical: 12.0, horizontal: 24.0),
                     shape: RoundedRectangleBorder(

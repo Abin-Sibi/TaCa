@@ -1,14 +1,26 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:taca/config/api_config.dart';
+import 'package:taca/controllers/auth_controller.dart';
 
 class PostReviewPage extends StatefulWidget {
   final String restaurantName;
 
-  PostReviewPage({required this.restaurantName});
+   final String restaurantId;
+   final String location;  // Add restaurantId as a parameter
+
+  PostReviewPage({
+    required this.restaurantName,
+    required this.restaurantId, 
+    required this.location, // Add restaurantId as a parameter
+  });
 
   @override
   _PostReviewPageState createState() => _PostReviewPageState();
@@ -71,30 +83,81 @@ class _PostReviewPageState extends State<PostReviewPage> {
     }
   }
 
-  void _postReview() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      await _getGeoLocation();
+ void _postReview() async {
+  if (_formKey.currentState?.validate() ?? false) {
+    await _getGeoLocation();
 
-      if (_currentPosition != null) {
-        print("Latitude: ${_currentPosition?.latitude}, Longitude: ${_currentPosition?.longitude}");
-        print("Location: $_locationName");
-        
-        Fluttertoast.showToast(
-          msg: "Review posted successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
+    final AuthController authController = Get.find<AuthController>();
+     final userDetails = authController.userDetails.value;
+
+    if (_currentPosition != null && _locationName.isNotEmpty) {
+      int status;
+      if(_locationName == widget.location){
+        status = 1;
+      }else{
+        status = 0;
+      }
+      final reviewData = {
+        "restaurantId": widget.restaurantId,
+        "restaurantName": widget.restaurantName,
+        "userName": "${userDetails['name'] ?? 'Unknown'}",
+        "reviewText": _reviewController.text,
+        "rating": _rating,
+        "location": {
+          "locationName": _locationName,
+          "longitude": _currentPosition?.longitude,
+          "latitude": _currentPosition?.latitude,
+        },
+        "verified":status,
+        "userId": "${userDetails['_id'] ?? 'Unknown'}",
+        "createdAt": DateTime.now().toIso8601String(),
+      };
+
+      try {
+        final response = await http.post(
+          Uri.parse('${APIConfig.baseURL}/reviews'),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(reviewData),
         );
 
-        Navigator.pop(context); // Return to the previous page
-      } else {
+        print(' ,${reviewData}');
+
+        if (response.statusCode == 201) {
+          Fluttertoast.showToast(
+            msg: "Review posted successfully!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+          );
+          Navigator.pop(context, true);  // Return true to indicate review was posted
+        } else {
+          print("Failed to post review: ${response.body}");
+          Fluttertoast.showToast(
+            msg: "Failed to post review.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+          );
+        }
+      } catch (e) {
+        print("Error posting review: $e");
         Fluttertoast.showToast(
-          msg: "Failed to get location. Review not posted.",
+          msg: "An error occurred while posting your review.",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
         );
       }
+    } else {
+      Fluttertoast.showToast(
+        msg: "Failed to get location. Review not posted.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
     }
   }
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

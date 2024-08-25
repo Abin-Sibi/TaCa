@@ -7,6 +7,7 @@ import 'models/restaurants.dart';
 import 'restaurant_details_page.dart';
 import 'widgets/restaurant_list_widget.dart';
 import 'utils/route_utils.dart';
+import 'package:taca/config/api_config.dart';
 
 class RestaurantList extends StatefulWidget {
   final String title;
@@ -28,8 +29,10 @@ class _RestaurantListState extends State<RestaurantList> {
 
   Future<void> fetchRestaurants() async {
     try {
+
+      print('object :khalkhdf  :${APIConfig.baseURL}');
       final response =
-          await http.get(Uri.parse('http://192.168.1.5:5000/api/restaurants'));
+          await http.get(Uri.parse('${APIConfig.baseURL}/restaurants'));
           print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
@@ -240,7 +243,7 @@ class _RestaurantListState extends State<RestaurantList> {
                 onTap: (Restaurant restaurant) {
                   Navigator.of(context).push(
                     createFadeRoute(
-                        RestaurantDetailPage(restaurant: restaurant)),
+                        RestaurantDetailPage(restaurant: restaurant, restaurantId: restaurant.id,)),
                   );
                 },
               ),

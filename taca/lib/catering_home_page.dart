@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:taca/caterer_details_page.dart';
+import 'package:taca/config/api_config.dart';
 import 'package:taca/utils/route_utils.dart';
 
 class CateringHomePage extends StatefulWidget {
@@ -15,12 +18,49 @@ class _CateringHomePageState extends State<CateringHomePage> {
     {'name': 'Other Events', 'icon': Icons.event},
   ];
 
-  final List<Map<String, dynamic>> caterers = [
-    {'name': 'Gourmet Catering', 'rating': 4.5, 'image': 'assets/images/caterer1.jpeg'},
-    {'name': 'Elite Cuisine', 'rating': 4.7, 'image': 'assets/images/caterer2.jpeg'},
-    {'name': 'Banquet Delight', 'rating': 4.2, 'image': 'assets/images/caterer3.jpeg'},
-    {'name': 'Savory Bites', 'rating': 4.8, 'image': 'assets/images/caterer1.jpeg'},
-  ];
+  List<Map<String, dynamic>> caterers = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCaterers();
+  }
+
+  Future<void> fetchCaterers() async {
+    final url = Uri.parse('${APIConfig.baseURL}/caterers');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        print('object  $data');
+        setState(() {
+          caterers = data.map((caterer) {
+            return {
+              'name': caterer['serviceName'],
+              'rating': caterer['ratings'],
+              'location':caterer['location'],
+              'image': 'assets/images/caterer2.jpeg',
+              'catId':caterer['_id'], // Placeholder image path
+            };
+          }).toList();
+          isLoading = false;
+        });
+      } else {
+        // Handle error
+        print('Failed to load caterers');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      // Handle exception
+      print('Error: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +77,7 @@ class _CateringHomePageState extends State<CateringHomePage> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            color: Colors.white, // This color is ignored but required for ShaderMask
+            color: Colors.white,
           ),
         ),
         title: ShaderMask(
@@ -51,187 +91,189 @@ class _CateringHomePageState extends State<CateringHomePage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white, // This color is ignored but required for ShaderMask
+              color: Colors.white,
             ),
           ),
         ),
         backgroundColor: Colors.black,
       ),
-      backgroundColor: Color(0xFF2C2C2C), // Light black/dark gray background
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: [Colors.deepOrange, Colors.orangeAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ).createShader(bounds),
-                child: Text(
-                  'Choose Your Event Type',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Select from the categories below to explore catering services that best suit your event.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                ),
-              ),
-              SizedBox(height: 16),
-              // Category Selection
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return Container(
-                      margin: const EdgeInsets.only(right: 16.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Handle category selection
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black54,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.all(8), // Adjust padding to fit icons
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(category['icon'], color: Colors.white, size: 30), // Reduced icon size
-                            SizedBox(height: 8),
-                            Text(
-                              category['name'],
-                              style: TextStyle(color: Colors.white, fontSize: 12), // Reduced font size
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+      backgroundColor: Color(0xFF2C2C2C),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [Colors.deepOrange, Colors.orangeAccent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        'Choose Your Event Type',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 20),
-              ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: [Colors.deepOrange, Colors.orangeAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ).createShader(bounds),
-                child: Text(
-                  'Available Caterers',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              // Caterers Grid
-              SizedBox(
-                height: MediaQuery.of(context).size.height - 300, // Adjust height to fit the remaining screen space
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemCount: caterers.length,
-                  itemBuilder: (context, index) {
-                    final caterer = caterers[index];
-                    return MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(16.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: Offset(0, 3), // Shadow position
-                            ),
-                          ],
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(createFadeRoute(CatererDetailPage(caterer: caterer)));
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-                                  child: Image.asset(
-                                    caterer['image'],
-                                    fit: BoxFit.cover,
-                                  ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Select from the categories below to explore catering services that best suit your event.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    // Category Selection
+                    SizedBox(
+                      height: 80,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final category = categories[index];
+                          return Container(
+                            margin: const EdgeInsets.only(right: 16.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Handle category selection
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black54,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
+                                padding: EdgeInsets.all(8),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
-                                    colors: [Colors.deepOrange, Colors.orangeAccent],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ).createShader(bounds),
-                                  child: Text(
-                                    caterer['name'],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(category['icon'], color: Colors.white, size: 30),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    category['name'],
+                                    style: TextStyle(color: Colors.white, fontSize: 12),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Row(
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [Colors.deepOrange, Colors.orangeAccent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        'Available Caterers',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    // Caterers Grid
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height - 300,
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: caterers.length,
+                        itemBuilder: (context, index) {
+                          final caterer = caterers[index];
+                          return MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              curve: Curves.easeInOut,
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(16.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(createFadeRoute(CatererDetailPage(caterer: caterer)));
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    Icon(Icons.star, color: Colors.amber, size: 16),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      '${caterer['rating']}',
-                                      style: TextStyle(fontSize: 16, color: Colors.white),
+                                    Expanded(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+                                        child: Image.asset(
+                                          caterer['image'],
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ShaderMask(
+                                        shaderCallback: (bounds) => LinearGradient(
+                                          colors: [Colors.deepOrange, Colors.orangeAccent],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ).createShader(bounds),
+                                        child: Text(
+                                          caterer['name'],
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.star, color: Colors.amber, size: 16),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            '${caterer['rating']}',
+                                            style: TextStyle(fontSize: 16, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

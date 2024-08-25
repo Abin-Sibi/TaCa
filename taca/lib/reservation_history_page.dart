@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:taca/config/api_config.dart';
+import 'package:taca/controllers/auth_controller.dart';
 
 class ReservationHistoryPage extends StatefulWidget {
   @override
@@ -6,13 +11,19 @@ class ReservationHistoryPage extends StatefulWidget {
 }
 
 class _ReservationHistoryPageState extends State<ReservationHistoryPage> with SingleTickerProviderStateMixin {
-
   late TabController _tabController;
+  List<Map<String, dynamic>> _reservations = [];
+
+ final AuthController authController = Get.find<AuthController>();
+     
+
+  
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _fetchReservations(); // Fetch reservations on page load
   }
 
   @override
@@ -22,8 +33,38 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
   }
 
 
+
+
+@override
+void didUpdateWidget(covariant ReservationHistoryPage oldWidget) {
+  super.didUpdateWidget(oldWidget);
+  _fetchReservations(); // Fetch reservations when the widget updates
+}
+
+  Future<void> _fetchReservations() async {
+    final userDetails = authController.userDetails.value;
+    final response = await http.get(Uri.parse('${APIConfig.baseURL}/history/${userDetails['_id']}'));
+    
+    print('htis is th e response $response'); // Replace with your API URL
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _reservations = data.map((item) => item as Map<String, dynamic>).toList();
+        
+      });
+    } else {
+      // Handle the error case
+      print('Failed to load reservations');
+    }
+  }
+
+ 
   @override
   Widget build(BuildContext context) {
+     final userDetails = authController.userDetails.value;
+  print('heloooo $userDetails');
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Booking Status'),
@@ -74,7 +115,7 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Hello, Abin!",
+                        "Hello, ${userDetails['name'] ?? 'Unknown'}!",
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.white,
@@ -92,7 +133,7 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
                         ],
                       ),
                       Container(
-                        height: 400, // Adjust the height as needed
+                        height: 550, // Adjust the height as needed
                         child: TabBarView(
                           controller: _tabController,
                           children: [
@@ -113,20 +154,26 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
   }
 
   Widget _buildTablesReserved() {
-    return ListView(
-      padding: EdgeInsets.all(16.0),
-      children: [
-        ReservationCard(
-          restaurantName: "Paragon Restaurant, Calicut",
-          date: "January 2, 2023",
-          time: "7:00 AM",
-          seats: 4,
-          tableNumber: 6,
-        ),
-        // Add more ReservationCard widgets here
-      ],
-    );
-  }
+  return ListView.builder(
+    padding: EdgeInsets.all(16.0),
+    itemCount: _reservations.length,
+    itemBuilder: (context, index) {
+      final reservation = _reservations[index];
+      return Column(
+        children: [
+          ReservationCard(
+            restaurantName: reservation['restaurantName'] ?? 'Unknown Restaurant',
+            date: reservation['date'] ?? 'Unknown Date',
+            time: reservation['time'] ?? 'Unknown Time',
+            seats: List<Map<String, dynamic>>.from(reservation['seats'] ?? []),
+          ),
+          SizedBox(height: 16), // Space between cards
+        ],
+      );
+    },
+  );
+}
+
 
   Widget _buildCateringsBooked() {
     return ListView(
@@ -147,15 +194,13 @@ class ReservationCard extends StatelessWidget {
   final String restaurantName;
   final String date;
   final String time;
-  final int seats;
-  final int tableNumber;
+  final List<Map<String, dynamic>> seats;
 
   ReservationCard({
     required this.restaurantName,
     required this.date,
     required this.time,
     required this.seats,
-    required this.tableNumber,
   });
 
   @override
@@ -203,35 +248,23 @@ class ReservationCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                "Seats: ",
-                style: TextStyle(color: Colors.white.withOpacity(0.6)),
-              ),
-              Text(
-                "$seats",
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
+          SizedBox(height: 10),
+          Text(
+            "Seats: ",
+            style: TextStyle(color: Colors.white.withOpacity(0.6)),
           ),
-          SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                "Table: ",
-                style: TextStyle(color: Colors.white.withOpacity(0.6)),
-              ),
-              Text(
-                "$tableNumber",
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
+          ...seats.map((seat) {
+            return Text(
+              "Table ${seat['tableNumber']}: ${seat['chairs']} chairs",
+              style: TextStyle(color: Colors.white),
+            );
+          }).toList(),
         ],
+        
       ),
+      
     );
+    
   }
 }
 

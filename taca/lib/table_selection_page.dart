@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:taca/config/api_config.dart';
 import 'package:taca/utils/route_utils.dart';
 import 'confirmation_page.dart';
 
@@ -9,11 +10,13 @@ class TableSelectionPage extends StatefulWidget {
   final String restaurantName;
   final DateTime selectedDate;
   final TimeOfDay selectedTime;
+  final String restaurantId;
 
   TableSelectionPage({
     required this.restaurantName,
     required this.selectedDate,
     required this.selectedTime,
+    required this.restaurantId,
   });
 
   @override
@@ -22,7 +25,7 @@ class TableSelectionPage extends StatefulWidget {
 
 class _TableSelectionPageState extends State<TableSelectionPage> {
   List<Map<String, dynamic>> _tables = [];
-  Set<int> _selectedTables = Set<int>();
+  Set<Map<String, dynamic>> _selectedTables = Set<Map<String, dynamic>>();
   bool _isLoading = true;
   String _errorMessage = '';
 
@@ -34,21 +37,55 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
 
   Future<void> _fetchTables() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.5:5000/api/restaurants')); // Adjust the URL as needed
+      final response = await http.get(Uri.parse(
+          '${APIConfig.baseURL}/restaurants')); // Adjust the URL as needed
       if (response.statusCode == 200) {
         List<dynamic> tableData = jsonDecode(response.body);
 
         // Find the restaurant with the specified name and get its tables
         Map<String, dynamic>? restaurantWithTables = tableData.firstWhere(
-          (restaurant) => restaurant['name'] == widget.restaurantName && restaurant['tables'] != null && (restaurant['tables'] as List).isNotEmpty,
-          orElse: () => null // Default value if no restaurant with the name is found
-        );
+            (restaurant) =>
+                restaurant['name'] == widget.restaurantName &&
+                restaurant['tables'] != null &&
+                (restaurant['tables'] as List).isNotEmpty,
+            orElse: () =>
+                null // Default value if no restaurant with the name is found
+            );
 
         if (restaurantWithTables != null) {
+          DateTime selectedDateTime = DateTime(
+            widget.selectedDate.year,
+            widget.selectedDate.month,
+            widget.selectedDate.day,
+            widget.selectedTime.hour,
+            widget.selectedTime.minute,
+          ).toUtc();
+
           setState(() {
-            _tables = (restaurantWithTables['tables'] as List<dynamic>)
-                .map((table) => table as Map<String, dynamic>)
-                .toList();
+            _tables =
+                (restaurantWithTables['tables'] as List<dynamic>).map((table) {
+              Map<String, dynamic> tableMap = table as Map<String, dynamic>;
+              // Print the entire table map to see its structure
+              print('aaakkkoo $tableMap');
+
+              // Print the booking details to inspect what's inside
+              print(tableMap['bookingDetails']);
+              if (tableMap['bookingDetails'] != null) {
+                DateTime bookedFrom =
+                    DateTime.parse(tableMap['bookingDetails']['bookedFrom']);
+                DateTime bookedTo =
+                    DateTime.parse(tableMap['bookingDetails']['bookedTo']);
+                print(
+                    'helooo selectdateee:  $selectedDateTime $bookedTo $bookedFrom hello:  ${selectedDateTime.isAfter(bookedFrom)}  ke;;ppp:  ${selectedDateTime.isBefore(bookedTo)}');
+                // Check if the selected date and time overlaps with the booked time
+                if (selectedDateTime.isAfter(bookedFrom) &&
+                    selectedDateTime.isBefore(bookedTo)) {
+                  print('i am herreee');
+                  tableMap['isBooked'] = true;
+                }
+              }
+              return tableMap;
+            }).toList();
           });
         } else {
           setState(() {
@@ -72,53 +109,65 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
   Widget buildTable(Map<String, dynamic> table) {
     int tableNumber = table['tableNumber'];
     int chairCount = table['chairs'];
+    bool isBooked = table['isBooked'] ?? false;
 
-    // Slightly reduced base size for table
     double baseTableSize = 50.0;
-
-    // Calculate table size based on the number of chairs
     double tableSize = baseTableSize + (chairCount - 1) * 10.0;
-    double chairSize = 18.0; // Slightly reduced size of the chairs
-    double borderPadding = 8.0; // Reduced padding around the table and chairs
+    double chairSize = 18.0;
+    double borderPadding = 8.0;
 
-    // Get the position of the table from the data
     double xPos = table['position']['x']?.toDouble() ?? 0.0;
     double yPos = table['position']['y']?.toDouble() ?? 0.0;
+
+    bool isSelected = _selectedTables.any((selectedTable) => selectedTable['_id'] == table['_id']);
 
     return Positioned(
       left: xPos,
       top: yPos,
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            if (_selectedTables.contains(tableNumber)) {
-              _selectedTables.remove(tableNumber);
-            } else {
-              _selectedTables.add(tableNumber);
-            }
-          });
+          if (!isBooked) {
+            setState(() {
+              Map<String, dynamic> selectedTable = {
+                '_id': table['_id'],
+                'tableNumber': tableNumber,
+                'chairs': chairCount,
+              };
+
+              if (isSelected) {
+                _selectedTables.removeWhere((selectedTable) => selectedTable['_id'] == table['_id']);
+              } else {
+                _selectedTables.add(selectedTable);
+              }
+            });
+          }
         },
         child: Container(
           padding: EdgeInsets.all(borderPadding),
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Enhanced Table Container with gradient and no outer border
               Container(
                 width: tableSize,
                 height: tableSize,
                 decoration: BoxDecoration(
-                  gradient: _selectedTables.contains(tableNumber)
+                  gradient: isBooked
                       ? LinearGradient(
-                          colors: [Colors.deepOrange, Colors.orangeAccent],
+                          colors: [Colors.grey, Colors.grey],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         )
-                      : LinearGradient(
-                          colors: [Colors.grey[700]!, Colors.grey[500]!],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                      : isSelected
+                          ? LinearGradient(
+                              colors: [Colors.deepOrange, Color.fromARGB(255, 244, 149, 27)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : LinearGradient(
+                              colors: [Color.fromARGB(255, 250, 197, 128), Color.fromARGB(255, 249, 125, 87)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
@@ -138,7 +187,6 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
                   ),
                 ),
               ),
-              // Enhanced chairs with better visibility and rounded shapes
               for (int i = 0; i < chairCount; i++)
                 Positioned(
                   left: (tableSize / 2 - chairSize / 2) +
@@ -148,8 +196,13 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
                       (tableSize / 2 - chairSize / 2) *
                           math.sin(2 * math.pi * i / chairCount),
                   child: Transform.rotate(
-                    angle: 2 * math.pi * i / chairCount, // Rotate to face the table
-                    child: Icon(Icons.chair_rounded, size: chairSize, color: const Color.fromARGB(255, 4, 4, 4)),
+                    angle: 2 *
+                        math.pi *
+                        i /
+                        chairCount,
+                    child: Icon(Icons.chair_rounded,
+                        size: chairSize,
+                        color: const Color.fromARGB(255, 4, 4, 4)),
                   ),
                 ),
             ],
@@ -158,6 +211,7 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +226,9 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage, style: TextStyle(color: Colors.white)))
+              ? Center(
+                  child: Text(_errorMessage,
+                      style: TextStyle(color: Colors.white)))
               : Stack(
                   children: _tables.map((table) => buildTable(table)).toList(),
                 ),
@@ -180,11 +236,13 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  createFadeRoute( ConfirmationPage(
+                  createFadeRoute(
+                    ConfirmationPage(
                       restaurantName: widget.restaurantName,
                       selectedDate: widget.selectedDate,
                       selectedTime: widget.selectedTime,
-                      tableNumbers: _selectedTables.toList(),
+                      tableData: _selectedTables.toList(),
+                      restaurantId:widget.restaurantId,
                     ),
                   ),
                 );
@@ -201,7 +259,8 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
                 padding: const EdgeInsets.all(15.0),
                 child: Icon(Icons.check, color: Colors.white),
               ),
-              backgroundColor: Colors.transparent, // Make the FAB transparent to show the gradient
+              backgroundColor: Colors
+                  .transparent, // Make the FAB transparent to show the gradient
             )
           : null,
     );
