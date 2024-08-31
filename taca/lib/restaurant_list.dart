@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:http/http.dart' as http;
@@ -20,31 +19,85 @@ class RestaurantList extends StatefulWidget {
 
 class _RestaurantListState extends State<RestaurantList> {
   List<Restaurant> _restaurants = [];
+  List<Restaurant> _filteredRestaurants = [];
+  List<Restaurant> _restaurantRec = [];
+  List<Restaurant> _filteredRestaurantsRec = [];
+  String _searchQuery = '';
+  String _selectedType = '';
+  String _selectedCategory = '';
+  String _selectedGeography = '';
 
   @override
   void initState() {
     super.initState();
     fetchRestaurants();
+    fetchFilteredRestaurants();
   }
 
   Future<void> fetchRestaurants() async {
     try {
-
-      print('object :khalkhdf  :${APIConfig.baseURL}');
-      final response =
-          await http.get(Uri.parse('${APIConfig.baseURL}/restaurants'));
-          print('Response body: ${response.body}');
+      final response = await http.get(Uri.parse('${APIConfig.baseURL}/restaurants'));
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
         setState(() {
           _restaurants = data.map((json) => Restaurant.fromJson(json)).toList();
+          _filteredRestaurants = _restaurants;
         });
       } else {
         throw Exception('Failed to load restaurants');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error occurred: $e');
+      print('Stack trace: $stackTrace');
     }
+  }
+
+  Future<void> fetchFilteredRestaurants() async {
+    try {
+      final response = await http.get(Uri.parse('${APIConfig.baseURL}/filtered-reviews'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _restaurantRec = data.map((json) => Restaurant.fromJson(json)).toList();
+          _filteredRestaurantsRec = _restaurantRec;
+        });
+      } else {
+        throw Exception('Failed to load recommended restaurants');
+      }
+    } catch (e, stackTrace) {
+      print('Error occurred: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  void _filterRestaurants() {
+    setState(() {
+      _filteredRestaurants = _restaurants.where((restaurant) {
+        bool matchesSearchQuery = _searchQuery.isEmpty || 
+            restaurant.name.toLowerCase().contains(_searchQuery.toLowerCase());
+
+        bool matchesType = _selectedType.isEmpty || 
+            restaurant.type == _selectedType;
+
+        bool matchesCategory = _selectedCategory.isEmpty || 
+            restaurant.category == _selectedCategory;
+
+        bool matchesGeography = _selectedGeography.isEmpty || 
+            restaurant.geography == _selectedGeography;
+
+        return matchesSearchQuery && matchesType && matchesCategory && matchesGeography;
+      }).toList();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    _searchQuery = query;
+    _filterRestaurants();
+  }
+
+  void _onFilterApplied(BuildContext dialogContext) {
+    _filterRestaurants();
+    Navigator.of(dialogContext).pop();
   }
 
   void _showFilterDialog(BuildContext context) {
@@ -57,53 +110,47 @@ class _RestaurantListState extends State<RestaurantList> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Type',
-                ),
-                items: <String>[
-                  'Italian',
-                  'Chinese',
-                  'Indian',
-                  'Mexican',
-                  'Thai'
-                ].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {},
-              ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Category',
-                ),
-                items: <String>[
-                  'Vegetarian',
-                  'Non-Vegetarian',
-                  'Vegan',
-                  'Gluten-Free',
-                  'Halal',
-                ].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {},
-              ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Geography',
-                ),
-                items: <String>['North', 'South', 'East', 'West', 'Central']
+                decoration: InputDecoration(labelText: 'Type'),
+                value: _selectedType.isEmpty ? null : _selectedType,
+                items: <String>['', 'Italian', 'Chinese', 'Indian', 'Mexican', 'Thai']
                     .map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(value.isEmpty ? 'All' : value),
                   );
                 }).toList(),
-                onChanged: (newValue) {},
+                onChanged: (newValue) {
+                  _selectedType = newValue ?? '';
+                },
+              ),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(labelText: 'Category'),
+                value: _selectedCategory.isEmpty ? null : _selectedCategory,
+                items: <String>[
+                  '', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free', 'Halal',
+                ].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value.isEmpty ? 'All' : value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  _selectedCategory = newValue ?? '';
+                },
+              ),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(labelText: 'Geography'),
+                value: _selectedGeography.isEmpty ? null : _selectedGeography,
+                items: <String>['', 'North', 'South', 'East', 'West', 'Central']
+                    .map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value.isEmpty ? 'All' : value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  _selectedGeography = newValue ?? '';
+                },
               ),
             ],
           ),
@@ -116,9 +163,7 @@ class _RestaurantListState extends State<RestaurantList> {
             ),
             TextButton(
               child: Text('Apply'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => _onFilterApplied(context),
             ),
           ],
         );
@@ -130,10 +175,7 @@ class _RestaurantListState extends State<RestaurantList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.title,
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text(widget.title, style: TextStyle(color: Colors.white)),
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
       ),
@@ -143,9 +185,25 @@ class _RestaurantListState extends State<RestaurantList> {
           child: Column(
             children: <Widget>[
               const SizedBox(height: 20),
-              CarouselSlider(
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'Recommended for you',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              CarouselSlider.builder(
+                itemCount: _filteredRestaurantsRec.isNotEmpty ? _filteredRestaurantsRec.length : 1,
                 options: CarouselOptions(
-                  height: 200.0,
+                  height: 250.0,
                   autoPlay: true,
                   enlargeCenterPage: true,
                   aspectRatio: 16 / 9,
@@ -154,31 +212,70 @@ class _RestaurantListState extends State<RestaurantList> {
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   viewportFraction: 0.8,
                 ),
-                items: [
-                  'assets/images/hill2.jpeg',
-                  'assets/images/hill3.jpeg',
-                  'assets/images/lake2.jpeg'
-                ].map((i) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.deepOrange, Colors.orangeAccent],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Image.asset(
-                          i,
-                          fit: BoxFit.cover,
-                        ),
+                itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+                  if (_filteredRestaurantsRec.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No recommendations available',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+                  final restaurant = _filteredRestaurantsRec[itemIndex];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        createFadeRoute(RestaurantDetailPage(
+                          restaurant: restaurant,
+                          restaurantId: restaurant.id,
+                        )),
                       );
                     },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [Colors.deepOrange, Colors.orangeAccent],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Card(
+                        color: Colors.grey[850],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              title: Text(
+                                restaurant.name,
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                restaurant.place,
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                              trailing: Text(
+                                '${restaurant.averageRating}/5',
+                                style: TextStyle(color: Colors.yellowAccent),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Type: ${restaurant.type} | Category: ${restaurant.category} | Geography: ${restaurant.geography}',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   );
-                }).toList(),
+                },
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -192,58 +289,60 @@ class _RestaurantListState extends State<RestaurantList> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
-                              color: Colors
-                                  .deepOrange, // Set the border color here
+                              color: Colors.deepOrange,
                               width: 2,
                               style: BorderStyle.solid,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Colors
-                                  .deepOrange, // Set the border color when the TextField is enabled
-                              width: 2,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
-                              color: Colors
-                                  .orangeAccent, // Set the border color when the TextField is focused
+                              color: Colors.orangeAccent,
                               width: 2,
+                              style: BorderStyle.solid,
                             ),
                           ),
-                          prefixIcon:
-                              const Icon(Icons.search, color: Colors.white70),
-                          filled: true,
-                          fillColor: Colors.grey[800],
+                          prefixIcon: Icon(Icons.search, color: Colors.white70),
                         ),
                         style: TextStyle(color: Colors.white),
+                        onChanged: _onSearchChanged,
                       ),
                     ),
                     const SizedBox(width: 10),
-                    ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [Colors.deepOrange, Colors.orangeAccent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: IconButton(
-                        icon: Icon(Icons.filter_list),
-                        onPressed: () => _showFilterDialog(context),
-                        color: Colors.white, // Ensure the icon is visible
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.filter_list, color: Colors.white),
+                      onPressed: () => _showFilterDialog(context),
                     ),
                   ],
                 ),
               ),
-              RestaurantListWidget(
-                restaurants: _restaurants,
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _filteredRestaurants.length,
+                itemBuilder: (context, index) {
+                  final restaurant = _filteredRestaurants[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        createFadeRoute(RestaurantDetailPage(
+                          restaurant: restaurant,
+                          restaurantId: restaurant.id,
+                        )),
+                      );
+                    },
+                    child: RestaurantListWidget(
+                restaurants: _filteredRestaurants,
                 onTap: (Restaurant restaurant) {
                   Navigator.of(context).push(
-                    createFadeRoute(
-                        RestaurantDetailPage(restaurant: restaurant, restaurantId: restaurant.id,)),
+                    createFadeRoute(RestaurantDetailPage(
+                      restaurant: restaurant,
+                      restaurantId: restaurant.id,
+                    )),
+                  );
+                },
+              ),
+
                   );
                 },
               ),

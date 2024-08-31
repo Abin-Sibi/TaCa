@@ -9,6 +9,8 @@ class AuthService {
   final AuthController _authController = Get.find<AuthController>();
 
   Future<LoginResult> login(String email, String password) async {
+    
+    print('objectklahflha $email');
     final response = await http.post(
       Uri.parse('${APIConfig.baseURL}/auth/login'),
       headers: <String, String>{
@@ -16,9 +18,10 @@ class AuthService {
       },
       body: jsonEncode(<String, String>{
         'email': email,
-        'password': password,
+        'password': password,     
       }),
     );
+
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);

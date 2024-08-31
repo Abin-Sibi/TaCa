@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:taca/booking_status_page.dart';
 import 'package:taca/config/api_config.dart';
 import 'package:taca/controllers/auth_controller.dart';
+import 'package:taca/utils/route_utils.dart';
 
 class ReservationHistoryPage extends StatefulWidget {
   @override
@@ -13,6 +15,7 @@ class ReservationHistoryPage extends StatefulWidget {
 class _ReservationHistoryPageState extends State<ReservationHistoryPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<Map<String, dynamic>> _reservations = [];
+  List<Map<String, dynamic>> _bookings = [];
 
  final AuthController authController = Get.find<AuthController>();
      
@@ -39,13 +42,14 @@ class _ReservationHistoryPageState extends State<ReservationHistoryPage> with Si
 void didUpdateWidget(covariant ReservationHistoryPage oldWidget) {
   super.didUpdateWidget(oldWidget);
   _fetchReservations(); // Fetch reservations when the widget updates
+  fetchOrderDetails();
 }
 
   Future<void> _fetchReservations() async {
     final userDetails = authController.userDetails.value;
     final response = await http.get(Uri.parse('${APIConfig.baseURL}/history/${userDetails['_id']}'));
     
-    print('htis is th e response $response'); // Replace with your API URL
+     // Replace with your API URL
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
@@ -59,6 +63,27 @@ void didUpdateWidget(covariant ReservationHistoryPage oldWidget) {
     }
   }
 
+  Future<void> fetchOrderDetails() async {
+    final userDetails = authController.userDetails.value;
+  final response = await http.get(
+    Uri.parse('${APIConfig.baseURL}/userorders/${userDetails['_id']}'), // Replace with your API endpoint
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  );
+  print('htis is th e response ${response.body} lkjhljlj');
+
+  if (response.statusCode == 200) {
+    // Decode the response body
+    List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _bookings = data.map((item) => item as Map<String, dynamic>).toList();
+        
+      });
+  } else {
+    print('Failed to load order details. Status code: ${response.statusCode}');
+  }
+}
  
   @override
   Widget build(BuildContext context) {
@@ -176,18 +201,49 @@ void didUpdateWidget(covariant ReservationHistoryPage oldWidget) {
 
 
   Widget _buildCateringsBooked() {
-    return ListView(
-      padding: EdgeInsets.all(16.0),
-      children: [
-        CateringCard(
-          cateringName: "Delicious Caterers",
-          date: "February 14, 2023",
-          menu: "Buffet",
+  return ListView.builder(
+    padding: EdgeInsets.all(16.0),
+    itemCount: _bookings.length,
+    itemBuilder: (context, index) {
+      final bookings = _bookings[index];
+
+      // Assuming you have the necessary data for BookingStatusPage
+      final cartItems = bookings['items'] ?? [];
+      final caterer = bookings['caterer'] ?? {};
+      final totalAmount = bookings['totalAmount'] ?? 0.0;
+      final status = bookings['status'] ?? {};
+      final accepted = bookings['accepted'] ?? false;
+      final completed = bookings['completed'] ?? false;
+
+      return GestureDetector(
+        onTap: () {
+          // Navigate to the BookingStatusPage
+          Navigator.of(context).push(createFadeRoute(BookingStatusPage(
+                cartItems: List<Map<String, dynamic>>.from(cartItems),
+                caterer: Map<String, dynamic>.from(caterer),
+                totalAmount: totalAmount.toDouble(),
+                status: Map<String, dynamic>.from(status),
+                accepted: accepted,
+                completed: completed,
+              ),
+            ),
+          );
+        },
+        child: Column(
+          children: [
+            CateringCard(
+              cateringName: bookings['userId'] ?? 'Unknown User',
+              date: bookings['date'] ?? 'Unknown Date',
+              menu: bookings['menu'] ?? 'Unknown Menu',
+            ),
+            SizedBox(height: 16),
+          ],
         ),
-        // Add more CateringCard widgets here
-      ],
-    );
-  }
+      );
+    },
+  );
+}
+
 }
 
 class ReservationCard extends StatelessWidget {

@@ -10,6 +10,8 @@ class Restaurant {
   final List<TableModel> tables;
   final String imageUrl;
   final int rating;
+  final double averageRating;
+  
 
   Restaurant({
     required this.id,
@@ -23,6 +25,7 @@ class Restaurant {
     required this.tables,
     required this.imageUrl, 
     required this.rating,
+    required this.averageRating,
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
@@ -38,6 +41,7 @@ class Restaurant {
       tables: (json['tables'] as List).map((i) => TableModel.fromJson(i)).toList(),
       imageUrl: json['imageUrl'] ?? 'assets/images/splash_logo.png',
       rating: json['rating'] ?? 5,
+       averageRating: json['averageRating']?.toDouble() ?? 0.0,
     );
   }
 }
@@ -59,8 +63,8 @@ class TableModel {
     return TableModel(
       tableNumber: json['tableNumber'],
       chairs: json['chairs'],
-      x: json['position']?['x'] ?? 0, // Safely access and provide default values
-      y: json['position']?['y'] ?? 0,
+      x: (json['position']?['x'] ?? 0 as num).toInt(), // Safely access and provide default values
+      y: (json['position']?['y'] ?? 0 as num).toInt(),
     );
   }
 }

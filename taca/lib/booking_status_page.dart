@@ -4,11 +4,17 @@ class BookingStatusPage extends StatelessWidget {
   final List<Map<String, dynamic>> cartItems;
   final Map<String, dynamic> caterer;
   final double totalAmount;
+  final Map<String, dynamic> status;
+  final bool accepted;
+  final bool completed;
 
   BookingStatusPage({
     required this.cartItems,
     required this.caterer,
     required this.totalAmount,
+    required this.status,
+    required this.accepted,
+    required this.completed,
   });
 
   @override
@@ -40,6 +46,28 @@ class BookingStatusPage extends StatelessWidget {
     );
   }
 
+  Widget _buildStatusList() {
+    final statusItems = [
+      {'status': 'Order Accepted', 'isCompleted': accepted},
+      {'status': 'Packed', 'isCompleted': status['packed'] ?? false},
+      {'status': 'Sent', 'isCompleted': status['sent'] ?? false},
+      {'status': 'Delivered', 'isCompleted': status['delivered'] ?? false},
+      {'status': 'Payment Received', 'isCompleted': status['payment'] ?? false},
+    ];
+
+    return Column(
+      children: List.generate(statusItems.length, (index) {
+        final item = statusItems[index];
+        return _buildStatusCard(
+          item['status'] as String, 
+          item['isCompleted'] as bool, 
+          index, 
+          statusItems.length,
+        );
+      }),
+    );
+  }
+
   Widget _buildBookingDetails() {
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -66,7 +94,7 @@ class BookingStatusPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10),
-          _buildDetailRow('Caterer:', caterer['name']),
+          _buildDetailRow('Caterer:', caterer['name'] ?? 'Unknown Caterer'),
           _buildDetailRow('Total Amount:', '\$$totalAmount'),
           SizedBox(height: 10),
           Text(
@@ -77,7 +105,7 @@ class BookingStatusPage extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          ...cartItems.map((item) => _buildDetailRow(item['name'], 'x${item['quantity']}')),
+          ...cartItems.map((item) => _buildDetailRow(item['name'] ?? 'Unknown Item', 'x${item['quantity'] ?? 0}')),
         ],
       ),
     );
@@ -127,27 +155,6 @@ class BookingStatusPage extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-    );
-  }
-
-  Widget _buildStatusList() {
-    final statusItems = [
-      {'status': 'Order Accepted', 'isCompleted': true},
-      {'status': 'Made Call', 'isCompleted': false},
-      {'status': 'Order Confirmed', 'isCompleted': false},
-      {'status': 'Item Delivered', 'isCompleted': false},
-    ];
-
-    return Column(
-      children: List.generate(statusItems.length, (index) {
-        final item = statusItems[index];
-        return _buildStatusCard(
-          item['status'] as String, 
-          item['isCompleted'] as bool, 
-          index, 
-          statusItems.length,
-        );
-      }),
     );
   }
 

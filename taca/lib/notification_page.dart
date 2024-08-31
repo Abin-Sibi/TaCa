@@ -19,7 +19,6 @@ class _NotificationPageState extends State<NotificationPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Search Bar
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.0),

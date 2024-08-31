@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // For making HTTP requests
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:taca/booking_status_page.dart';
 import 'package:taca/config/api_config.dart';
+import 'package:taca/controllers/auth_controller.dart';
 import 'package:taca/utils/route_utils.dart';
 
 class CatererDetailPage extends StatefulWidget {
   final Map<String, dynamic> caterer;
+ 
 
   CatererDetailPage({required this.caterer});
 
@@ -23,15 +26,18 @@ class _CatererDetailPageState extends State<CatererDetailPage> {
   Map<String, bool> expandedCategories = {};
   bool isLoading = true; // Loading state
 
+
   @override
   void initState() {
     super.initState();
-     print('Received caterer: ${widget.caterer}');
+    print('Received caterer: ${widget.caterer}');
     print('Received catId: ${widget.caterer['catId']}');
     fetchCategories();
   }
 
   // Function to fetch categories and dishes from the API
+
+
   Future<void> fetchCategories() async {
     print('88888888,${widget.caterer}');
     final response = await http.get(Uri.parse('${APIConfig.baseURL}/menu/${widget.caterer['catId']}')); // Replace with your API endpoint
@@ -62,6 +68,55 @@ class _CatererDetailPageState extends State<CatererDetailPage> {
         isLoading = false; // Stop loading even if there's an error
       });
       print('Failed to load categories');
+    }
+  }
+
+  // Function to handle the booking process
+  Future<void> confirmBooking(double currentTotalAmount) async {
+     final AuthController authController = Get.find<AuthController>();
+     final userDetails = authController.userDetails.value; 
+    final userId = '${userDetails['_id'] ?? 'Unknown'}'; // Replace with the actual user ID
+    final catererId = widget.caterer['catId'];
+    
+    final bookingData = {
+      'userId': userId,
+      'catererId': catererId,
+      'totalAmount': currentTotalAmount,
+      'items': cartItems,
+    };
+    print("object ${bookingData}");
+
+    final response = await http.post(
+      Uri.parse('${APIConfig.baseURL}/orders'), // Replace with your API endpoint
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(bookingData),
+    );
+    print(response.body);
+
+ 
+
+    if (response.statusCode == 201) {
+      final jsonResponse = jsonDecode(response.body);
+
+  // Extract the order details from the response
+  final orderData = jsonResponse['order'];
+  final status = orderData['status'] as Map<String, dynamic>;
+  final accepted = orderData['accepted'] as bool;
+  final completed = orderData['completed'] as bool;
+      // Handle success
+      Navigator.of(context).push(createFadeRoute(BookingStatusPage(
+        cartItems: cartItems,
+        caterer: widget.caterer,
+        totalAmount: currentTotalAmount,
+         status: status, // Pass the status map
+    accepted: accepted, // Pass the accepted value
+    completed: completed, // Pass the completed value
+      )));
+    } else {
+      // Handle error
+      print('Failed to create booking');
     }
   }
 
@@ -396,21 +451,7 @@ class _CatererDetailPageState extends State<CatererDetailPage> {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).push(createFadeRoute(BookingStatusPage(
-                            cartItems: cartItems,
-                            caterer: caterer,
-                            totalAmount: totalAmount,
-                          )));
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => BookingStatusPage(
-                      //       // cartItems: cartItems,
-                      //       // caterer: caterer,
-                      //       // totalAmount: totalAmount,
-                      //     ),
-                      //   ),
-                      // );
+                      confirmBooking(currentTotalAmount);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
