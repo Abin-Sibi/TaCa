@@ -1,0 +1,145 @@
+
+.profile-container {
+  display: flex;
+  max-width: 600px;
+  margin: 70px auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.profile-sidebar {
+  width: 40%;
+  text-align: center;
+  background-color: #1a1a2e;
+  color: #fff;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.profile-sidebar h2 {
+  margin: 20px;
+}
+
+.profile-pic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-pic img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.upload-button {
+  padding: 10px;
+  background-color: #f4f4f9;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upload-button:hover {
+  background-color: #ddd;
+}
+
+.social-links button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f4f4f9;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.social-links button:hover {
+  background-color: #ddd;
+}
+
+.profile-main {
+  width: 60%;
+  padding: 10px;
+}
+
+.profile-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.proup{
+  color: #1a1a2e;
+}
+/* .form-group {
+  margin-bottom: 20px;
+} */
+
+.form-group label {
+  display: block;
+  /* margin-bottom: 5px; */
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #ff4500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  background-color: #fff;
+  color: #333;
+}
+
+.form-group textarea {
+  resize: vertical;
+  background-color: #fff;
+  color: #333;
+}
+
+.update-button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin-top: 5px;
+  background-color: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.update-button:hover {
+  background-color: #333;
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    flex-direction: column;
+  }
+
+  .profile-sidebar,
+  .profile-main {
+    width: 100%;
+  }
+}

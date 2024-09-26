@@ -1,7 +1,7 @@
 // lib/api_config.dart
 
 class APIConfig {
-  static const String baseURL = "http://192.168.1.8:5000/api";
+  static const String baseURL = "  ";
 
   // Example endpoints
   // static const String loginEndpoint = "$baseURL/";

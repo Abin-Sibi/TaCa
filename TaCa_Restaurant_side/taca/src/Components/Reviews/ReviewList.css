@@ -1,0 +1,25 @@
+.review-list-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.heading {
+    color: #ff4500;
+    margin-bottom: 20px;
+}
+
+.review-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.average-feedback {
+    margin-bottom: 20px;
+    font-size: 66px;
+    color: #ffd700;
+}
+
+.average-rating {
+    display: inline-block;
+}
+

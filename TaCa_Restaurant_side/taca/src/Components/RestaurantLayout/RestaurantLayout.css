@@ -1,0 +1,176 @@
+.restaurant-layout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px;
+  position: relative;
+  height: 140vh;
+  border:white solid;
+  width: 70vh;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.table {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+
+
+.table-rectangular {
+  width: 55px;
+  height: 55px;
+}
+
+.table-square { 
+  width: 65px;
+  height: 60px;
+}
+.table-square1 { 
+  width: 75px;
+  height: 75px;
+}
+
+.table-square2 { 
+  width: 85px;
+  height: 85px;
+}
+
+.table-square3 { 
+  width: 95px;
+  height: 95px;
+}
+
+.table-large-rectangular1 {
+  width: 105px;
+  height: 105px;
+}
+
+.table-large-rectangular2 {
+  width: 115px;
+  height: 110px;
+}
+
+.table-large-rectangular3 {
+  width: 125px;
+  height: 125px;
+}
+
+.table-large-rectangular {
+  width: 135px;
+  height: 135px;
+}
+
+.table-name {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 2;
+}
+
+.save-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+
+.chairs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.chair {
+  width: 15px;
+  height: 15px;
+  background-color: rgba(255, 0, 0, 0.8); /* Chair color */
+  border-radius: 50%;
+  position: absolute;
+}
+
+.chair.top-left {
+  top: -2px;
+  left: -2px;
+}
+
+.chair.top-right {
+  top: -2px;
+  right: -2px;
+}
+
+.chair.bottom-left {
+  bottom: -2px;
+  left: -2px;
+}
+
+.chair.bottom-right {
+  bottom: -2px;
+  right: -2px;
+}
+
+.chair.middle-left {
+  top: 50%;
+  left: -5px;
+  transform: translateY(-50%);
+}
+
+.h{
+  color: white;
+}
+
+.drop-area {
+  position: relative;
+  width: 100%;
+  height: 500px; /* Define the height for the drop area */
+  background-color: rgba(0, 0, 0, 0.2); /* Add a background for visibility */
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.table {
+  position: absolute;
+  cursor: grab;
+}
+
+
+/* Rest of your existing CSS... */
+
+
+.chair.middle-right {
+  top: 50%;
+  right: -5px;
+  transform: translateY(-50%);
+}
+
+.chair.top-middle {
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.chair.bottom-middle {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+

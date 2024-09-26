@@ -1,0 +1,159 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    background-color: rgb(6, 6, 6);
+    color: #fff;
+  }
+  
+  .dashboard {
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    min-height: 100vh;
+    margin:70px 50px;
+  }
+  
+  
+  .dashboard-header {
+    text-align: center;
+    color: #ff4500;
+    margin-bottom: 20px;
+  }
+
+  /* Dashboard.css */
+
+.reslayout {
+  padding: 20px;
+  background-color: #333;
+  color: #fff;
+  min-height: 100vh;
+  margin: 70px 50px;
+}
+.dname{
+  margin: 20px;
+  font-size: larger;
+}
+
+.table-create-btn {
+  display: flex;
+  flex-direction: column; /* Align children in a column */
+  align-items: center;    /* Center horizontally */
+  margin-bottom: 20px;    /* Space below the button */
+}
+
+.create-table-button {
+  width: 60px; /* Size of the button */
+  height: 60px; /* Size of the button */
+  border-radius: 50%;
+  background-color: #4CAF50; /* Button color */
+  color: white;
+  font-size: 36px; /* Font size for the plus sign */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.create-table-button:hover {
+  background-color: #45a049; /* Hover color */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.create-table-button:focus {
+  outline: none;
+}
+
+  
+  .dashboard-cards {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-card {
+    background-color: #444;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: #ff4500;
+    flex: 1;
+    margin: 0 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .dashboard-card h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  .dashboard-card p {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .dashboard-section {
+    background-color: #444;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .dashboard-section h3 {
+    color: #ff4500;
+    margin-bottom: 10px;
+  }
+  
+  .graph-placeholder {
+    height: 200px;
+    background-color: #555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ff4500;
+    font-size: 18px;
+    border-radius: 5px;
+  }
+  
+  .dashboard-section:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  @media (min-width: 768px) {
+    .dashboard-content {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .dashboard-cards {
+      flex-direction: row;
+    }
+  
+    .dashboard-card {
+      margin: 0 10px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .dashboard-content {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+  

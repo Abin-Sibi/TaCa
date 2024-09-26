@@ -1,0 +1,65 @@
+/* ProfileEditModal.css */
+
+.Modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    background: #333;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 90%;
+    max-height: 80vh; /* Set a maximum height */
+    width: 400px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+  }
+  
+  .profile-edit-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .profile-edit-form label {
+    margin-bottom: 5px;
+    color: #ff4500;
+  }
+  
+  .profile-edit-form input,
+  .profile-edit-form select,
+  .profile-edit-form textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+  }
+  
+  .profile-edit-form button {
+    padding: 10px 20px;
+    background-color: #ff4500;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+  }
+  
+  .profile-edit-form button:hover {
+    background-color: #e63900;
+  }
+  
